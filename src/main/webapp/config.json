@@ -1,4 +1,1 @@
-{
-    "baseUrl": "",
-    "buildMode": "DEV"
-}
+{"baseUrl":"{{DEVELOPMENT_URL}}","buildMode":"DEV","offlineStorage":false,"customUrlScheme":"com.mobilebasicsanity"}

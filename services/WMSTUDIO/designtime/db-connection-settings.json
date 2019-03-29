@@ -1,0 +1,71 @@
+{
+  "username" : "hr",
+  "password" : "7b6a43524a2d3f47367b6a3120",
+  "url" : "jdbc:oracle:thin:@//54.189.37.152:1521/WMSTUDIO",
+  "driverClass" : "oracle.jdbc.driver.OracleDriver",
+  "dialect" : "com.wavemaker.runtime.data.dialect.OracleDialect",
+  "serviceId" : "WMSTUDIO",
+  "packageName" : "com.mobilebasicsanity.wmstudio",
+  "dbType" : "Oracle",
+  "host" : "54.189.37.152",
+  "dbName" : "WMSTUDIO",
+  "port" : "1521",
+  "schemaName" : "HR",
+  "tableFilter" : [ {
+    "table" : "COUNTRIES",
+    "schema" : "HR"
+  }, {
+    "table" : "DEPARTMENTS",
+    "schema" : "HR"
+  }, {
+    "table" : "EMP_DETAILS_VIEW",
+    "schema" : "HR"
+  }, {
+    "table" : "employee",
+    "schema" : "HR"
+  }, {
+    "table" : "employee1",
+    "schema" : "HR"
+  }, {
+    "table" : "EMPLOYEES",
+    "schema" : "HR"
+  }, {
+    "table" : "INCLUDE",
+    "schema" : "HR"
+  }, {
+    "table" : "JOB_HISTORY",
+    "schema" : "HR"
+  }, {
+    "table" : "JOBS",
+    "schema" : "HR"
+  }, {
+    "table" : "LOCATIONS",
+    "schema" : "HR"
+  }, {
+    "table" : "NOPK",
+    "schema" : "HR"
+  }, {
+    "table" : "REGIONS",
+    "schema" : "HR"
+  }, {
+    "table" : "SampleTable",
+    "schema" : "HR"
+  } ],
+  "schemaFilter" : [ "HR" ],
+  "impersonateUser" : false,
+  "activeDirectoryDomain" : null,
+  "hbm2ddl" : "none",
+  "maxPageSize" : 100,
+  "minPoolSize" : 2,
+  "maxPoolSize" : 4,
+  "transactionTimeout" : 30,
+  "dataSourceType" : "WM_MANAGED_DATASOURCE",
+  "jndiName" : "",
+  "reloadInfo" : {
+    "reload" : false,
+    "reason" : null,
+    "message" : null,
+    "reImport" : false
+  },
+  "readOnly" : false
+}

@@ -1,4 +1,8 @@
 [ {
+  "name" : "Coffee",
+  "type" : "PAGE",
+  "params" : [ ]
+}, {
   "name" : "Common",
   "type" : "PARTIAL",
   "params" : [ ]

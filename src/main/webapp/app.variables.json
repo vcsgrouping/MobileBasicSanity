@@ -1,20 +1,4 @@
 {
-  "appNotification" : {
-    "_id" : "wm-appErrorHandler-wm.NotificationVariable-1454664620943",
-    "name" : "appNotification",
-    "owner" : "App",
-    "category" : "wm.NotificationVariable",
-    "dataBinding" : [ {
-    "target" : "class",
-    "value" : "Error",
-    "type" : "list"
-    }, {
-    "target" : "toasterPosition",
-    "value" : "bottom right",
-    "type" : "list"
-    } ],
-    "operation" : "toast"
-  },
   "appInfo" : {
     "_id" : "wm-getAppInfo-wm.DeviceVariable-1444134876543",
     "name" : "appInfo",
@@ -28,6 +12,22 @@
       "cordovaversion" : "X.X.X"
     },
     "startUpdate" : true
+  },
+  "appNotification" : {
+    "_id" : "wm-appErrorHandler-wm.NotificationVariable-1454664620943",
+    "name" : "appNotification",
+    "owner" : "App",
+    "category" : "wm.NotificationVariable",
+    "dataBinding" : [ {
+      "target" : "class",
+      "value" : "Error",
+      "type" : "list"
+    }, {
+      "target" : "toasterPosition",
+      "value" : "bottom right",
+      "type" : "list"
+    } ],
+    "operation" : "toast"
   },
   "deviceInfo" : {
     "_id" : "wm-deviceInfo-getDeviceInfo-wm.DeviceVariable-1444134852623",
@@ -45,6 +45,17 @@
       "deviceUUID" : "DEVICEUUID"
     },
     "startUpdate" : true
+  },
+  "goToPage_Coffee" : {
+    "_id" : "wm-goToPage_Coffee-wm.NavigationVariable-1553866442078",
+    "name" : "goToPage_Coffee",
+    "owner" : "App",
+    "category" : "wm.NavigationVariable",
+    "dataBinding" : [ ],
+    "operation" : "gotoPage",
+    "pageName" : "Coffee",
+    "dataSet" : [ ],
+    "pageTransitions" : "none"
   },
   "goToPage_Main" : {
     "_id" : "wm-wm.NavigationVariable1389180517517",
