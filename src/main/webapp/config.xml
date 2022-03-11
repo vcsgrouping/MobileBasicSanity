@@ -1,70 +1,61 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.mobilebasicsanity" version="0.0.1">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<widget xmlns:android="http://schemas.android.com/apk/res/android" id="com.mobilebasicsanity" version="0.0.1">
     <name>MobileBasicSanity</name>
-    <description></description>
+    <description/>
     <author email="saraswathi.rekhala@wavemaker.com" href="">saraswathi rekhala</author>
     <content src="index.html"/>
     <access origin="http://*/*"/>
     <access origin="https://*/*"/>
     <access origin="{{DEVELOPMENT_URL}}/*"/>
-    <plugin name="cordova-cookie-emperor" spec="https://github.com/RTK/cordova-cookie-emperor.git#3a73cfd"/>
+    
     <plugin name="cordova-plugin-app-version" spec="0.1.9"/>
     <plugin name="cordova-plugin-customurlscheme" spec="4.3.0">
         <variable name="URL_SCHEME" value="com.mobilebasicsanity"/>
     </plugin>
     <plugin name="cordova-plugin-device" spec="2.0.2"/>
     <plugin name="cordova-plugin-file" spec="6.0.1"/>
-    <plugin name="cordova-plugin-file-opener2" spec="https://github.com/wavemaker/cordova-plugin-file-opener2.git#d382e11"/>
-    <plugin name="cordova-plugin-file-transfer" spec="1.7.1"/>
+    
     <plugin name="cordova-plugin-inappbrowser" spec="3.0.0"/>
     <plugin name="cordova-plugin-mediascanner" spec="0.1.3"/>
     <plugin name="cordova-plugin-splashscreen" spec="5.0.2"/>
     <plugin name="cordova-plugin-statusbar" spec="2.4.2"/>
-    <plugin name="cordova-plugin-transport-security" spec="0.1.2"/>
     <plugin name="cordova-plugin-whitelist" spec="1.3.3"/>
     <plugin name="cordova-plugin-zeep" spec="0.0.4"/>
     <platform name="android">
-        <splash density="land-hdpi" qualifier="land-hdpi" height="0" src="resources/assets/android/splashes/drawable_land_hdpi/splash.png" width="0"/>
-        <splash density="land-ldpi" qualifier="land-ldpi" height="0" src="resources/assets/android/splashes/drawable_land_ldpi/splash.png" width="0"/>
-        <splash density="land-mdpi" qualifier="land-mdpi" height="0" src="resources/assets/android/splashes/drawable_land_mdpi/splash.png" width="0"/>
-        <splash density="land-xhdpi" qualifier="land-xhdpi" height="0" src="resources/assets/android/splashes/drawable_land_xhdpi/splash.png" width="0"/>
-        <splash density="land-xxhdpi" qualifier="land-xxhdpi" height="0" src="resources/assets/android/splashes/drawable_land_xxhdpi/splash.png" width="0"/>
-        <splash density="port-hdpi" qualifier="hdpi" height="0" src="resources/assets/android/splashes/drawable_hdpi/splash.png" width="0"/>
-        <splash density="port-ldpi" qualifier="ldpi" height="0" src="resources/assets/android/splashes/drawable_ldpi/splash.png" width="0"/>
-        <splash density="port-mdpi" qualifier="mdpi" height="0" src="resources/assets/android/splashes/drawable_mdpi/splash.png" width="0"/>
-        <splash density="port-xhdpi" qualifier="xhdpi" height="0" src="resources/assets/android/splashes/drawable_xhdpi/splash.png" width="0"/>
-        <splash density="port-xxhdpi" qualifier="xxhdpi" height="0" src="resources/assets/android/splashes/drawable_xxhdpi/splash.png" width="0"/>
+        <splash density="land-hdpi" height="0" qualifier="land-hdpi" src="resources/assets/android/splashes/drawable_land_hdpi/splash.png" width="0"/>
+        <splash density="land-ldpi" height="0" qualifier="land-ldpi" src="resources/assets/android/splashes/drawable_land_ldpi/splash.png" width="0"/>
+        <splash density="land-mdpi" height="0" qualifier="land-mdpi" src="resources/assets/android/splashes/drawable_land_mdpi/splash.png" width="0"/>
+        <splash density="land-xhdpi" height="0" qualifier="land-xhdpi" src="resources/assets/android/splashes/drawable_land_xhdpi/splash.png" width="0"/>
+        <splash density="land-xxhdpi" height="0" qualifier="land-xxhdpi" src="resources/assets/android/splashes/drawable_land_xxhdpi/splash.png" width="0"/>
+        <splash density="port-hdpi" height="0" qualifier="hdpi" src="resources/assets/android/splashes/drawable_hdpi/splash.png" width="0"/>
+        <splash density="port-ldpi" height="0" qualifier="ldpi" src="resources/assets/android/splashes/drawable_ldpi/splash.png" width="0"/>
+        <splash density="port-mdpi" height="0" qualifier="mdpi" src="resources/assets/android/splashes/drawable_mdpi/splash.png" width="0"/>
+        <splash density="port-xhdpi" height="0" qualifier="xhdpi" src="resources/assets/android/splashes/drawable_xhdpi/splash.png" width="0"/>
+        <splash density="port-xxhdpi" height="0" qualifier="xxhdpi" src="resources/assets/android/splashes/drawable_xxhdpi/splash.png" width="0"/>
         <icon density="hdpi" height="0" src="resources/assets/android/icons/icon-hdpi.png" width="0"/>
         <icon density="ldpi" height="0" src="resources/assets/android/icons/icon-ldpi.png" width="0"/>
         <icon density="mdpi" height="0" src="resources/assets/android/icons/icon-mdpi.png" width="0"/>
         <icon density="xhdpi" height="0" src="resources/assets/android/icons/icon-xhdpi.png" width="0"/>
         <icon density="xxhdpi" height="0" src="resources/assets/android/icons/icon-xxhdpi.png" width="0"/>
         <preference name="orientation" value="default"/>
-        <preference name="android-minSdkVersion" value="19"/>
+        <preference name="android-minSdkVersion" value="22"/>
         <preference name="SplashScreen" value="screen"/>
         <preference name="SplashScreenDelay" value="25000"/>
+        <config-file parent="/manifest" target="AndroidManifest.xml">
+            <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+        </config-file>
+        <edit-config file="AndroidManifest.xml" mode="merge" target="/manifest/./application">
+            <application android:requestLegacyExternalStorage="true" android:usesCleartextTraffic="true"/>
+        </edit-config>
     </platform>
     <platform name="ios">
-        <splash height="320" src="resources/assets/ios/splashes/default_Landscape@1x_iphone_480x320.png" width="480"/>
-        <splash height="480" src="resources/assets/ios/splashes/default_iphone.png" width="320"/>
-        <splash height="640" src="resources/assets/ios/splashes/default_Landscape@2x_iphone_960x640.png" width="960"/>
-        <splash height="640" src="resources/assets/ios/splashes/default_Landscape@2x_iphone_1136x640.png" width="1136"/>
-        <splash height="748" src="resources/assets/ios/splashes/default_Landscape_ipad_1024x748.png" width="1024"/>
-        <splash height="750" src="resources/assets/ios/splashes/default_750@2x_iphone6_landscape_1334x750.png" width="1334"/>
-        <splash height="768" src="resources/assets/ios/splashes/default_Landscape_ipad_1024x768.png" width="1024"/>
-        <splash height="960" src="resources/assets/ios/splashes/default@2x_iphone_640x960.png" width="640"/>
-        <splash height="1004" src="resources/assets/ios/splashes/default.png" width="768"/>
-        <splash height="1024" src="resources/assets/ios/splashes/default_Portrait_ipad_768x1024.png" width="768"/>
-        <splash height="1125" src="resources/assets/ios/splashes/default_1125@3x_iphoneX_landscape_2436x1125.png" width="2436"/>
-        <splash height="1136" src="resources/assets/ios/splashes/default_568h@2x_iphone_640x1136.png" width="640"/>
-        <splash height="1242" src="resources/assets/ios/splashes/default_1242@3x_iphone6s_landscape_2208x1242.png" width="2208"/>
-        <splash height="1334" src="resources/assets/ios/splashes/default_750@2x_iphone6_portrait_750x1334.png" width="750"/>
-        <splash height="1496" src="resources/assets/ios/splashes/default_Landscape@2x_ipad_2048x1496.png" width="2048"/>
-        <splash height="1536" src="resources/assets/ios/splashes/default_Landscape@2x_ipad_2048x1536.png" width="2048"/>
-        <splash height="2008" src="resources/assets/ios/splashes/default_Portrait@2x_ipad_1536x2008.png" width="1536"/>
-        <splash height="2048" src="resources/assets/ios/splashes/default_ipad.png" width="1536"/>
-        <splash height="2208" src="resources/assets/ios/splashes/default_1242@3x_iphone6s_portrait_1242x2208.png" width="1242"/>
-        <splash height="2436" src="resources/assets/ios/splashes/default_1125@3x_iphoneX_portrait_1125x2436.png" width="1125"/>
+        <splash height="750" qualifier="2x~iphone~comcom" src="resources/assets/ios/splashes/default_750@2x_iphone6_landscape_1334x750.png" width="1334"/>
+        <splash height="1242" qualifier="3x~iphone~anycom" src="resources/assets/ios/splashes/default_1242@3x_iphone6s_landscape_2208x1242.png" width="2208"/>
+        <splash height="1334" qualifier="2x~iphone~comany" src="resources/assets/ios/splashes/default_750@2x_iphone6_portrait_750x1334.png" width="750"/>
+        <splash height="2208" qualifier="3x~iphone~comany" src="resources/assets/ios/splashes/default_1242@3x_iphone6s_portrait_1242x2208.png" width="1242"/>
+        <splash height="2208" qualifier="3x~iphone~anyany" src="resources/assets/ios/splashes/default@3x_iphone_2208x2208.png" width="2208"/>
+        <splash height="2732" qualifier="2x~ipad~anyany" src="resources/assets/ios/splashes/default@2x_ipad_2732x2732.png" width="2732"/>
+        <splash height="1334" qualifier="2x~iphone~anyany" src="resources/assets/ios/splashes/default@2x_iphone_1334x1334.png" width="1334"/>
         <icon height="29" src="resources/assets/ios/icons/icon-29.png" width="29"/>
         <icon height="40" src="resources/assets/ios/icons/icon-40.png" width="40"/>
         <icon height="50" src="resources/assets/ios/icons/icon-50.png" width="50"/>
@@ -73,7 +64,6 @@
         <icon height="60" src="resources/assets/ios/icons/icon-60.png" width="60"/>
         <icon height="72" src="resources/assets/ios/icons/icon-72.png" width="72"/>
         <icon height="76" src="resources/assets/ios/icons/icon-76.png" width="76"/>
-        <icon height="80" src="resources/assets/ios/icons/icon-40@2x.png" width="80"/>
         <icon height="80" src="resources/assets/ios/icons/icon-80.png" width="80"/>
         <icon height="100" src="resources/assets/ios/icons/icon-100.png" width="100"/>
         <icon height="114" src="resources/assets/ios/icons/icon@2x.png" width="114"/>
@@ -81,44 +71,56 @@
         <icon height="144" src="resources/assets/ios/icons/icon-72@2x.png" width="144"/>
         <icon height="152" src="resources/assets/ios/icons/icon-76@2x.png" width="152"/>
         <icon height="180" src="resources/assets/ios/icons/icon-60@3x.png" width="180"/>
+        <icon height="1024" src="resources/assets/ios/icons/icon-1024@1x.png" width="1024"/>
         <preference name="orientation" value="all"/>
-        <preference name="deployment-target" value="10.0"/>
+        <preference name="SwiftVersion" value="4.2"/>
+        <preference name="deployment-target" value="12.0"/>
         <preference name="StatusBarStyle" value="lightcontent"/>
         <preference name="StatusBarOverlaysWebView" value="false"/>
         <preference name="SplashScreenDelay" value="4000"/>
         <preference name="StatusBarBackgroundColor" value="#000000"/>
-        <edit-config target="NSAppleMusicUsageDescription" mode="merge" file="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSAppleMusicUsageDescription">
             <string>need music library access to upload audio files</string>
         </edit-config>
-        <edit-config target="NSCalendarsUsageDescription" mode="merge" file="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSCalendarsUsageDescription">
             <string>need calendar access to add / remove events</string>
         </edit-config>
-        <edit-config target="NSCameraUsageDescription" mode="merge" file="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSCameraUsageDescription">
             <string>need camera access to take pictures</string>
         </edit-config>
-        <edit-config target="NSContactsUsageDescription" mode="merge" file="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSContactsUsageDescription">
             <string>need contacts access to search friends</string>
         </edit-config>
-        <edit-config target="NSLocationWhenInUseUsageDescription" mode="merge" file="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
             <string>need location access to find things nearby</string>
         </edit-config>
-        <edit-config target="NSMicrophoneUsageDescription" mode="merge" file="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSMicrophoneUsageDescription">
             <string>need microphone access to record sounds</string>
         </edit-config>
-        <edit-config target="NSPhotoLibraryAddUsageDescription" mode="merge" file="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSPhotoLibraryAddUsageDescription">
             <string>need photo library access to save pictures there</string>
         </edit-config>
-        <edit-config target="NSPhotoLibraryUsageDescription" mode="merge" file="*-Info.plist">
+        <edit-config file="*-Info.plist" mode="merge" target="NSPhotoLibraryUsageDescription">
             <string>need photo library access to get pictures from there</string>
         </edit-config>
-        <edit-config target="UIFileSharingEnabled" mode="merge" file="*-Info.plist">
-            <true></true>
+        <edit-config file="*-Info.plist" mode="merge" target="UIFileSharingEnabled">
+            <true/>
         </edit-config>
+        <edit-config file="*-Info.plist" mode="merge" target="NSLocationAlwaysUsageDescription">
+            <string>need location access to display user location on a map</string>
+        </edit-config>
+        <preference name="scheme" value="app"/>
+        <preference name="hostname" value="localhost"/>
+        <preference name="target-device" value="universal"/>
+        <icon height="20" src="resources/assets/ios/icons/icon-20.png" width="20"/>
+        <icon height="87" src="resources/assets/ios/icons/icon-87.png" width="87"/>
+        <icon height="167" src="resources/assets/ios/icons/icon-167.png" width="167"/>
+        <splash height="2732" qualifier="2x~ipad~comany" src="resources/assets/ios/splashes/Default@2x~ipad~comany.png" width="1278"/>
     </platform>
     <preference name="fullScreen" value="false"/>
+    <preference name="android-targetSdkVersion" value="29"/>
     <preference name="prerendered-icon" value="false"/>
     <preference name="ios-statusbarstyle" value="default"/>
-    <preference name="phonegap-version" value="cli-8.1.1"/>
     <preference name="windowSoftInputMode" value="stateVisible"/>
     <preference name="ShowSplashScreenSpinner" value="false"/>
     <preference name="DisallowOverscroll" value="true"/>

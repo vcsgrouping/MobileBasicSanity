@@ -1,46 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
-
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:security="http://www.springframework.org/schema/security" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
     <context:component-scan base-package="com.mobilebasicsanity.wmstudio.controller,com.mobilebasicsanity.wmstudio.service,com.mobilebasicsanity.wmstudio.dao"/>
-    <bean class="com.wavemaker.runtime.data.spring.WMPropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>
-                    classpath:WMSTUDIO.properties
-                </value>
-            </list>
-        </property>
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
-        <property name="searchSystemEnvironment" value="true"/>
+    <bean class="com.zaxxer.hikari.HikariConfig" id="WMSTUDIOHikariConfig">
+        <property name="jdbcUrl" value="${db.WMSTUDIO.url}"/>
+        <property name="driverClassName" value="${db.WMSTUDIO.driverClass}"/>
+        <property name="username" value="${db.WMSTUDIO.username}"/>
+        <property name="password" value="${db.WMSTUDIO.password}"/>
+        <property name="maximumPoolSize" value="${db.WMSTUDIO.maxPoolSize}"/>
+        <property name="minimumIdle" value="${db.WMSTUDIO.minPoolSize}"/>
+        <property name="connectionTimeout" value="30000"/>
+        <property name="validationTimeout" value="5000"/>
+        <property name="idleTimeout" value="600000"/>
+        <property name="maxLifetime" value="1800000"/>
+        <property name="initializationFailTimeout" value="-1"/>
+        <property name="leakDetectionThreshold" value="120000"/>
+        <property name="registerMbeans" value="false"/>
     </bean>
-
-    <bean id="WMSTUDIOHikariConfig" class="com.zaxxer.hikari.HikariConfig">
-        <property name="jdbcUrl" value="${WMSTUDIO.url}"/>
-        <property name="driverClassName" value="${WMSTUDIO.driverClass}"/>
-        <property name="username" value="${WMSTUDIO.username}"/>
-        <property name="password" value="${WMSTUDIO.password}"/>
-        <property name="maximumPoolSize" value="${WMSTUDIO.maxPoolSize}"/>
-        <property name="minimumIdle" value="${WMSTUDIO.minPoolSize}"/>
-        <property name="connectionTimeout" value="30000" />
-        <property name="validationTimeout" value="5000" />
-        <property name="idleTimeout" value="600000" />
-        <property name="maxLifetime" value="1800000" />
-        <property name="initializationFailTimeout" value="-1" />
-        <property name="leakDetectionThreshold" value="120000" />
-        <property name="registerMbeans" value="false" />
-    </bean>
-
-    <bean id="WMSTUDIOWMManagedDataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close" lazy-init="true">
+    <bean class="com.zaxxer.hikari.HikariDataSource" destroy-method="close" id="WMSTUDIOWMManagedDataSource" lazy-init="true">
         <constructor-arg ref="WMSTUDIOHikariConfig"/>
     </bean>
-
-    <bean id="WMSTUDIOEntityInterceptor" class="com.wavemaker.runtime.data.interceptors.WMEntityInterceptor"/>
-
-    <bean id="WMSTUDIOSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+    <bean class="com.wavemaker.runtime.data.interceptors.WMEntityInterceptor" id="WMSTUDIOEntityInterceptor"/>
+    <bean class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" id="WMSTUDIOSessionFactory">
         <property name="dataSource" ref="WMSTUDIODataSource"/>
         <property name="packagesToScan" value="com.mobilebasicsanity.wmstudio"/>
         <property name="entityInterceptor" ref="WMSTUDIOEntityInterceptor"/>
@@ -52,35 +32,31 @@
                 </value>
             </list>
         </property>
-
         <property name="hibernateProperties" ref="WMSTUDIOHibernateProperties"/>
     </bean>
-    <bean id="WMSTUDIOTransactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+    <bean class="org.springframework.orm.hibernate5.HibernateTransactionManager" id="WMSTUDIOTransactionManager">
         <property name="sessionFactory" ref="WMSTUDIOSessionFactory"/>
-        <property name="defaultTimeout" value="${WMSTUDIO.transactionTimeout}"/>
+        <property name="defaultTimeout" value="${db.WMSTUDIO.transactionTimeout}"/>
     </bean>
-    <bean id="WMSTUDIOTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+    <bean class="org.springframework.orm.hibernate5.HibernateTemplate" id="WMSTUDIOTemplate">
         <property name="sessionFactory" ref="WMSTUDIOSessionFactory"/>
     </bean>
-    
-    <bean id="WMSTUDIOWMQLTypeHelper" class="com.wavemaker.runtime.data.dao.query.types.wmql.WMQLDefaultTypeHelper" lazy-init="false" />
-    
-    <bean id="WMSTUDIOWMQueryExecutor" class="com.wavemaker.runtime.data.dao.query.WMQueryExecutorImpl">
+    <bean class="com.wavemaker.runtime.data.dao.query.types.wmql.WMQLDefaultTypeHelper" id="WMSTUDIOWMQLTypeHelper" lazy-init="false"/>
+    <bean class="com.wavemaker.runtime.data.dao.query.WMQueryExecutorImpl" id="WMSTUDIOWMQueryExecutor">
         <property name="template" ref="WMSTUDIOTemplate"/>
     </bean>
-    <bean id="WMSTUDIOWMProcedureExecutor" class="com.wavemaker.runtime.data.dao.procedure.WMProcedureExecutorImpl">
+    <bean class="com.wavemaker.runtime.data.dao.procedure.WMProcedureExecutorImpl" id="WMSTUDIOWMProcedureExecutor">
         <property name="template" ref="WMSTUDIOTemplate"/>
         <property name="serviceId" value="WMSTUDIO"/>
     </bean>
-
-    <bean id="WMSTUDIOHibernateProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <bean class="org.springframework.beans.factory.config.PropertiesFactoryBean" id="WMSTUDIOHibernateProperties">
         <property name="properties">
             <props>
                 <prop key="hibernate.dialect">
-                ${WMSTUDIO.dialect}
+                ${db.WMSTUDIO.dialect}
                 </prop>
-                    <prop key="hibernate.default_schema">
-                    `${WMSTUDIO.schemaName}`
+                <prop key="hibernate.default_schema">
+                    `${db.WMSTUDIO.schemaName}`
                     </prop>
                 <prop key="hibernate.show_sql">
                     false
@@ -89,7 +65,7 @@
                     false
                 </prop>
                 <prop key="hibernate.hbm2ddl.auto">
-                ${WMSTUDIO.hbm2ddl}
+                ${db.WMSTUDIO.hbm2ddl}
                 </prop>
                 <prop key="hibernate.temp.use_jdbc_metadata_defaults">
                     false
@@ -100,28 +76,16 @@
             </props>
         </property>
     </bean>
-
-    <bean id="WMSTUDIOPageableHandlerMethodResolver" class="com.wavemaker.runtime.resolver.WMPageableHandlerMethodArgumentResolver" >
+    <bean class="com.wavemaker.runtime.resolver.WMPageableHandlerMethodArgumentResolver" id="WMSTUDIOPageableHandlerMethodResolver">
         <property name="pageParameterName" value="page"/>
         <property name="sizeParameterName" value="size"/>
         <property name="oneIndexedParameters" value="true"/>
-        <property name="maxPageSize" value="${WMSTUDIO.maxPageSize}"/>
-        <property name="fallbackPageable">
-            <bean  class="org.springframework.data.domain.PageRequest">
-                <constructor-arg  value="0"/>
-                <constructor-arg  value="20"/>
-            </bean>
-        </property>
+        <property name="maxPageSize" value="${db.WMSTUDIO.maxPageSize}"/>
     </bean>
-
-    <bean id="WMSTUDIODataSource" class="com.wavemaker.runtime.data.datasource.WMDataSource">
-        <property name="dataSourceType" value="${WMSTUDIO.dataSourceType}"/>
-        <property name="jndiName" value="${WMSTUDIO.jndiName}"/>
+    <bean class="com.wavemaker.runtime.data.datasource.WMDataSource" id="WMSTUDIODataSource">
+        <property name="dataSourceType" value="${db.WMSTUDIO.dataSourceType}"/>
+        <property name="jndiName" value="${db.WMSTUDIO.jndiName}"/>
         <property name="serviceId" value="WMSTUDIO"/>
     </bean>
-
-
     <tx:annotation-driven/>
-
 </beans>
-

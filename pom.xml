@@ -10,19 +10,29 @@
             <resource>
                 <filtering>true</filtering>
                 <directory>src/main/resources</directory>
+                <includes>
+                    <include>app.properties</include>
+                </includes>
             </resource>
             <resource>
-                <filtering>true</filtering>
-                <directory>services/WMSTUDIO/src</directory>
+                <filtering>false</filtering>
+                <directory>src/main/resources</directory>
                 <excludes>
-                    <exclude>**/*.java</exclude>
+                    <exclude>app.properties</exclude>
                 </excludes>
             </resource>
             <resource>
                 <filtering>true</filtering>
-                <directory>services/securityService/src</directory>
+                <directory>target/generated-resources</directory>
+                <includes>
+                    <include>conf/**.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <filtering>false</filtering>
+                <directory>target/generated-resources</directory>
                 <excludes>
-                    <exclude>**/*.java</exclude>
+                    <exclude>conf/**.properties</exclude>
                 </excludes>
             </resource>
         </resources>
@@ -61,9 +71,26 @@
                     <artifactId>wavemaker-workspace-sync-plugin</artifactId>
                     <version>${wavemaker.studio.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.wavemaker.studio</groupId>
+                    <artifactId>wavemaker-studio-maven-plugin</artifactId>
+                    <version>${wavemaker.studio.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <warSourceExcludes>README.md</warSourceExcludes>
+                    <webResources>
+                        <resource>
+                            <directory>target/ui-build/output-files</directory>
+            </resource>
+          </webResources>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -83,41 +110,12 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>add-dynamic-properties</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <source>if (project.properties.get('build.ui.mode') != null) {
-                                    if (project.properties.get('build.ui.mode').equalsIgnoreCase('angular')) {
-                                        project.properties.webAppDirectory = 'target/codegen/generated-app/dist'
-                                    }
-                                }
-                                if (project.properties.get('webAppDirectory') == null) {
-                                    project.properties.webAppDirectory = 'src/main/webapp'
-                                }</source>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.1</version>
-                <configuration>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
-          </nonFilteredFileExtensions>
-                </configuration>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>clean project</id>
@@ -138,7 +136,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.7</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>add-source</id>
@@ -157,7 +155,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>Copy init</id>
@@ -168,6 +166,18 @@
                         <configuration>
                             <target>
                                 <ant antfile="${basedir}/build.xml" target="init"/>
+              </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Copy resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <ant antfile="${basedir}/build.xml" target="generate-resources"/>
               </target>
                         </configuration>
                     </execution>
@@ -187,7 +197,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -207,6 +217,13 @@
                             <goal>generate</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>pre-compile actions</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>pre-compile</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -216,23 +233,39 @@
                 <executions>
                     <execution>
                         <id>package app sources</id>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>package-app</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>package cordova zip</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>package-cordova</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <webResources>
-                        <resource>
-                            <directory>${webAppDirectory}</directory>
-            </resource>
-          </webResources>
-                </configuration>
+                <groupId>com.wavemaker.studio</groupId>
+                <artifactId>wavemaker-studio-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>clean controllers</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>clean-javaservice-controllers</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>Generate controllers for the java service</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>generate-javaservice-controllers</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -263,7 +296,7 @@
                 <dependency>
                     <groupId>com.wavemaker.runtime</groupId>
                     <artifactId>wavemaker-app-runtime-core</artifactId>
-                    <version>${wavemaker.studio.version}</version>
+                    <version>${wavemaker.app.runtime.services.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -281,7 +314,7 @@
             </snapshots>
             <id>central</id>
             <name>Maven Repository Switchboard</name>
-            <url>http://repo1.maven.org/maven2</url>
+            <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
             <releases>
@@ -293,7 +326,7 @@
             </snapshots>
             <id>wavemaker-maven-repo</id>
             <name>wavemaker-maven-repo</name>
-            <url>http://s3.amazonaws.com/maven.wavemaker.com/release</url>
+            <url>https://s3.amazonaws.com/maven.wavemaker.com/release</url>
         </repository>
     </repositories>
     <pluginRepositories>
@@ -307,7 +340,7 @@
             </snapshots>
             <id>wavemaker-maven-repo</id>
             <name>wavemaker-maven-repo</name>
-            <url>http://s3.amazonaws.com/maven.wavemaker.com/release</url>
+            <url>https://s3.amazonaws.com/maven.wavemaker.com/release</url>
         </pluginRepository>
     </pluginRepositories>
     <dependencies>
@@ -328,37 +361,22 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-framework-bom</artifactId>
-                <version>${spring.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-bom</artifactId>
-                <version>${spring.security.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.wavemaker.runtime</groupId>
-                <artifactId>wavemaker-app-runtime</artifactId>
-                <version>${wavemaker.studio.version}</version>
+                <artifactId>wavemaker-app-runtime-services</artifactId>
+                <version>${wavemaker.app.runtime.services.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
-        <wavemaker.studio.version>9.9.9</wavemaker.studio.version>
-        <spring.security.version>5.0.8.RELEASE</spring.security.version>
+        <wavemaker.artifactType>wmmobile</wavemaker.artifactType>
         <profile.props.file>development.properties</profile.props.file>
-        <project.lib.directory>${basedir}/lib</project.lib.directory>
-        <wavemaker.artifactStaticFolder>wmmobile</wavemaker.artifactStaticFolder>
+        <wavemaker.app.runtime.services.version>10.13.0.ee</wavemaker.app.runtime.services.version>
+        <wavemaker.studio.version>10.13.0.ee</wavemaker.studio.version>
+        <wavemaker.app.runtime.ui.version>10.13.0-rc.5156</wavemaker.app.runtime.ui.version>
         <wavemaker.studio.release.version>10.0.0</wavemaker.studio.release.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <wavemaker.artifactType>wmmobile</wavemaker.artifactType>
-        <spring.version>5.1.4.RELEASE</spring.version>
+        <project.lib.directory>${basedir}/lib</project.lib.directory>
     </properties>
 </project>

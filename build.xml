@@ -3,17 +3,18 @@
         Project Build Helper
     </description>
     <property name="webInf" location="src/main/webapp/WEB-INF"/>
+    <property name="uiOutputDirectory" location="target/ui-build/output-files"/>
+    <!-- Below are the default build values -->
+    <property name="cdn-url" value=""/>
+    <property name="optimizeUIBuild" value=""/>
+    <property name="build.ui.mode" value="wm"/>
+    <property name="app.pwa.enabled" value="false"/>
 
-    <property name="angular-out-directory" value="${basedir}/target/codegen"/>
-    <property name="angular_build_file_location" location="${angular-out-directory}/build.xml"/>
-
-    <condition property="isAngularBuild" value="true">
-        <equals arg1="${build.ui.mode}" arg2="angular" casesensitive="false" trim="true"/>
+    <condition property="wmBuild" value="true">
+        <equals arg1="${build.ui.mode}" arg2="wm" casesensitive="false" trim="true"/>
     </condition>
-    <condition property="isWmBuild" value="true">
-        <not>
-            <equals arg1="${build.ui.mode}" arg2="angular" casesensitive="false" trim="true"/>
-        </not>
+    <condition property="angularBuild" value="true">
+        <equals arg1="${build.ui.mode}" arg2="angular" casesensitive="false" trim="true"/>
     </condition>
 
     <target name="copy-libs-jar">
@@ -34,19 +35,19 @@
 
     <target name="cdnUrl-replace">
         <replaceregexp file="src/main/webapp/index.html" byline="true">
-            <regexp pattern="/studio/.*/wmapp"/>
+            <regexp pattern="//.*.cloudfront.net/app-runtime/.*/wmapp"/>
             <substitution expression="_cdnUrl_/wmapp"/>
         </replaceregexp>
         <replaceregexp file="src/main/webapp/index.html" byline="true">
-            <regexp pattern="//.*.cloudfront.net/studio-app/.*/wmapp"/>
+            <regexp pattern="/app-runtime/.*/wmapp"/>
             <substitution expression="_cdnUrl_/wmapp"/>
         </replaceregexp>
         <replaceregexp file="src/main/webapp/index.html" byline="true">
-            <regexp pattern="/studio/.*/wmmobile"/>
+            <regexp pattern="//.*.cloudfront.net/app-runtime/.*/wmmobile"/>
             <substitution expression="_cdnUrl_/wmmobile"/>
         </replaceregexp>
         <replaceregexp file="src/main/webapp/index.html" byline="true">
-            <regexp pattern="//.*.cloudfront.net/studio-app/.*/wmmobile"/>
+            <regexp pattern="/app-runtime/.*/wmmobile"/>
             <substitution expression="_cdnUrl_/wmmobile"/>
         </replaceregexp>
     </target>
@@ -60,61 +61,39 @@
             <os family="windows"/>
         </condition>
 
+        <echo>Executing command "${cmd.executable}" with args "${cmd.argline}" in directory ${cmd.executable.dir}</echo>
         <exec executable="${cmd.executable}" dir="${cmd.executable.dir}" failonerror="true">
             <arg line="${cmd.argline}"/>
         </exec>
-        <echo>Ran command "${cmd.executable}" with args "${cmd.argline}" in directory ${cmd.executable.dir}</echo>
     </target>
 
-    <target name="angular-unpack">
-        <antcall target="cmd-template">
-            <param name="cmd.name" value="mvn"/>
-            <!--Artifact groupId:artifactId:version[:packaging[:classifier]]. -DrepoUrl=${wavemaker.repo.url}-->
-            <param name="cmd.arg"
-                   value="org.apache.maven.plugins:maven-dependency-plugin:3.1.1:unpack -Dartifact=com.wavemaker.app.build:wavemaker-ng-codegen:${wavemaker.studio.version}:zip:wmapp -DoutputDirectory=${angular-out-directory}"/>
-            <param name="cmd.executable.dir" value="./"/>
-        </antcall>
-    </target>
-
-    <target name="build-angular-app" depends="angular-unpack">
-        <echo>Downloaded Angular Runtime Files</echo>
-        <condition property="build.ui.ng.args" value="">
-            <not>
-                <isset property="build.ui.ng.args"/>
-            </not>
-        </condition>
-        <ant antfile="${angular_build_file_location}" target="ng-build-angular-app">
-            <property name="ngBuildArgs" value="${build.ui.ng.args}"/>
-            <property name="nodeBuildArgs" value="${build.ui.node.args}"/>
-            <property name="codegen_location" value="${angular-out-directory}"/>
-        </ant>
-        <echo>Angular Code Generated</echo>
-    </target>
-
-
-    <target name="wm-unpack">
-        <antcall target="cmd-template">
-            <param name="cmd.name" value="mvn"/>
-            <!--Artifact groupId:artifactId:version[:packaging[:classifier]].-->
-            <param name="cmd.arg"
-                   value="org.apache.maven.plugins:maven-dependency-plugin:3.1.1:unpack  -Dartifact=com.wavemaker.runtime:wavemaker-app-runtime:${wavemaker.studio.version}:zip:${wavemaker.artifactType} -DoutputDirectory=${basedir}/src/main/webapp/${wavemaker.artifactStaticFolder}"/>
-            <param name="cmd.executable.dir" value="./"/>
-        </antcall>
-    </target>
-
-    <target name="wmBuild" if="isWmBuild">
-        <antcall target="wm-unpack"/>
-        <echo>UI Build done with WaveMaker Runtime!</echo>
-    </target>
-
-    <target name="angularBuild" if="isAngularBuild">
-        <antcall target="build-angular-app"/>
-        <echo>UI Build done with Angular Runtime!</echo>
+    <target name="generate-ui-zip" if="angularBuild">
+        <echo>creating target/ui-artifact.zip from ${uiOutputDirectory}.</echo>
+        <zip destfile="target/ui-artifact.zip" basedir="${uiOutputDirectory}"/>
     </target>
 
     <target name="uiBuild">
-        <antcall target="wmBuild"/>
-        <antcall target="angularBuild"/>
+        <antcall target="cmd-template">
+            <param name="cmd.name" value="node"/>
+            <param name="cmd.arg"
+                value="ui-build.js --nodeVMArgs='${build.ui.node.args}' --ngBuildParams='${build.ui.ng.config}' --runtimeUIVersion=${wavemaker.app.runtime.ui.version} --appSrc=. --appTarget=./target/ui-build/generated-app --buildType=${build.ui.mode} --platformType=${wavemaker.artifactType} --cdnUrl=${cdn-url} --optimizeUIBuild=${optimizeUIBuild} --pwa=${app.pwa.enabled}"/>
+            <param name="cmd.executable.dir" value="./"/>
+        </antcall>
+        <antcall target="generate-ui-zip"/>
+    </target>
+
+    <target name="generate-resources">
+        <delete dir="target/generated-resources"/>
+        <mkdir dir="target/generated-resources"/>
+        <copy todir="target/generated-resources" includeemptydirs="false">
+            <fileset dir="services" includes="**/src/**" defaultexcludes="no" casesensitive="yes" erroronmissingdir="false">
+                <patternset id="excluded.files">
+                    <exclude name="**/*.java"/>
+                    <exclude name="**/*.md"/>
+                </patternset>
+            </fileset>
+            <cutdirsmapper dirs="2"/>
+        </copy>
     </target>
 
     <target name="init" depends="copy-libs-jar,copy-wm-project-properties,cdnUrl-replace"></target>

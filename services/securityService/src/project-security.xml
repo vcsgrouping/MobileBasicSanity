@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<beans xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd" xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
     <bean class="com.wavemaker.runtime.security.SecurityService" id="securityService"/>
     <bean class="com.wavemaker.runtime.security.controller.SecurityController" id="securityController"/>
     <bean class="com.wavemaker.runtime.web.filter.SSLSecureFilter" id="sslSecureFilter"/>
@@ -8,9 +8,9 @@
         <property name="frameOptions" ref="frameOptions"/>
     </bean>
     <bean class="com.wavemaker.commons.model.security.FrameOptions" id="frameOptions">
-        <property name="enabled" value="${general.frameOptions.enabled}"/>
-        <property name="mode" value="${general.frameOptions.mode}"/>
-        <property name="allowFromUrl" value="${general.frameOptions.allowFromUrl}"/>
+        <property name="enabled" value="${security.general.frameOptions.enabled}"/>
+        <property name="mode" value="${security.general.frameOptions.mode}"/>
+        <property name="allowFromUrl" value="${security.general.frameOptions.allowFromUrl}"/>
     </bean>
     <bean class="com.wavemaker.runtime.security.filter.WMXContentTypeOptionsFilter" id="wmXContentTypeOptionsFilter"/>
     <bean class="org.springframework.web.filter.CorsFilter" id="corsFilter">
@@ -20,48 +20,37 @@
     <bean class="com.wavemaker.runtime.cors.CorsBeanPostProcessor" id="corsBeanPostProcessor"/>
     <bean class="org.springframework.security.web.FilterChainProxy" id="wmCompositeSecurityFilter">
         <constructor-arg>
-            <security:filter-chain pattern="/**" filters="sslSecureFilter, wmXSSFilter, wmFrameOptionsFilter, wmXContentTypeOptionsFilter,corsFilter"/>
+            <security:filter-chain filters="sslSecureFilter, wmXSSFilter, wmFrameOptionsFilter, wmXContentTypeOptionsFilter,corsFilter" pattern="/**"/>
         </constructor-arg>
-    </bean>
-    <bean class="com.wavemaker.runtime.data.spring.WMPropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>
-                    classpath:securityService.properties
-                </value>
-            </list>
-        </property>
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
-        <property name="searchSystemEnvironment" value="true"/>
     </bean>
     <bean class="com.wavemaker.runtime.security.config.WMAppSecurityConfig" id="WMAppSecurityConfig">
         <property name="sslConfig" ref="sslConfig"/>
         <property name="xssConfig" ref="xssConfig"/>
         <property name="enforceSecurity">
-            <value>${enabled}</value>
+            <value>${security.enabled}</value>
         </property>
     </bean>
     <bean class="com.wavemaker.commons.model.security.SSLConfig" id="sslConfig">
-        <property name="useSSL" value="${general.ssl.enabled}"/>
-        <property name="sslPort" value="${general.ssl.port}"/>
+        <property name="useSSL" value="${security.general.ssl.enabled}"/>
+        <property name="sslPort" value="${security.general.ssl.port}"/>
         <property name="excludedUrls" value="#{null}"/>
     </bean>
     <bean class="com.wavemaker.commons.model.security.XSSConfig" id="xssConfig">
-        <property name="enforceXssSecurity" value="${general.xss.enabled}"/>
+        <property name="enforceXssSecurity" value="${security.general.xss.enabled}"/>
         <property name="policyFile" value="wm-xss-policies.xml"/>
         <property name="xssFilterStrategy" value="ENCODE"/>
+        <property name="dataBackwardCompatibility" value="${security.general.xss.dataBackwardCompatibility}"/>
     </bean>
     <bean class="com.wavemaker.commons.model.security.CorsConfig" id="corsConfig">
-        <property name="enabled" value="${general.cors.enabled}"/>
-        <property name="maxAge" value="${general.cors.maxAge}"/>
-        <property name="allowCredentials" value="${general.cors.allowCredentials}"/>
+        <property name="enabled" value="${security.general.cors.enabled}"/>
+        <property name="maxAge" value="${security.general.cors.maxAge}"/>
+        <property name="allowCredentials" value="${security.general.cors.allowCredentials}"/>
         <property name="pathEntries">
             <list>
                 <bean class="com.wavemaker.commons.model.security.PathEntry" id="root">
                     <property name="name" value="root"/>
                     <property name="path" value="/**"/>
-                    <property name="allowedOrigins" value="${general.cors.root.allowedOrigins}"/>
+                    <property name="allowedOrigins" value="${security.general.cors.root.allowedOrigins}"/>
                 </bean>
             </list>
         </property>

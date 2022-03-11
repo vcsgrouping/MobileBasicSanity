@@ -108,13 +108,16 @@
         <listener-class>com.wavemaker.runtime.web.listener.LoggingInitializationListener</listener-class>
     </listener>
     <listener>
-        <listener-class>com.wavemaker.runtime.server.CleanupListener</listener-class>
+        <listener-class>com.wavemaker.runtime.web.listener.CleanupListener</listener-class>
     </listener>
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     <listener>
         <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.wavemaker.runtime.web.listener.AppNameMDCStartStopListener</listener-class>
     </listener>
 
     <!--
@@ -123,19 +126,59 @@
     -->
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>/WEB-INF/project-springapp.xml,classpath:**/*prefab-services.xml</param-value>
+        <param-value>/WEB-INF/project-springapp.xml</param-value>
     </context-param>
-    
+
+    <context-param>
+        <param-name>contextInitializerClasses</param-name>
+        <param-value>com.wavemaker.runtime.core.props.WMApplicationContextInitializer,com.wavemaker.runtime.security.DefaultBootStrapPropertySourceInitializer</param-value>
+    </context-param>
+
     <filter>
-        <filter-name>gzipCompressionFilter</filter-name>
+        <filter-name>throwableTranslationFilter</filter-name>
+        <filter-class>com.wavemaker.commons.web.filter.ThrowableTranslationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>throwableTranslationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>firewallFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
         <init-param>
             <param-name>targetBeanName</param-name>
-            <param-value>gzipCompressionFilter</param-value>
+            <param-value>firewallFilter</param-value>
         </init-param>
     </filter>
     <filter-mapping>
-        <filter-name>gzipCompressionFilter</filter-name>
+        <filter-name>firewallFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>requestTrackingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetBeanName</param-name>
+            <param-value>requestTrackingFilter</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>requestTrackingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <filter>
+        <filter-name>wmCompressionFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetBeanName</param-name>
+            <param-value>wmCompressionFilter</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>wmCompressionFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
