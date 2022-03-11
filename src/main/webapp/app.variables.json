@@ -75,6 +75,7 @@
     },
     "type" : "string",
     "isList" : false,
-    "saveInPhonegap" : false
+    "saveInPhonegap" : false,
+    "twoWayBinding" : false
   }
 }
