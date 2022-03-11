@@ -62,9 +62,11 @@
   "dataSourceType" : "WM_MANAGED_DATASOURCE",
   "jndiName" : "",
   "reloadInfo" : {
-    "reload" : true,
-    "reason" : "MIGRATION_FAILED",
-    "message" : "Source code re-generation needed for adding EntityService annotation"
+    "reload" : false,
+    "reason" : null,
+    "message" : null,
+    "reImport" : false
   },
-  "readOnly" : false
+  "readOnly" : false,
+  "metadataDialect" : null
 }

@@ -85,6 +85,20 @@ public interface JobHistoryService {
      */
     JobHistory update(@Valid JobHistory jobHistory);
 
+
+    /**
+     * Partially updates the details of an existing JobHistory. It updates only the
+     * fields of the existing JobHistory which are passed in the jobHistoryPatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on JobHistory if any.
+     *
+     * @param jobhistoryId The id of the JobHistory to be deleted; value cannot be null.
+     * @param jobHistoryPatch The partial data of JobHistory which is supposed to be updated; value cannot be null.
+     * @return The updated JobHistory.
+     * @throws EntityNotFoundException if no JobHistory is found with given input.
+     */
+    JobHistory partialUpdate(JobHistoryId jobhistoryId, Map<String, Object> jobHistoryPatch);
+
     /**
      * Deletes an existing JobHistory with the given id.
      *

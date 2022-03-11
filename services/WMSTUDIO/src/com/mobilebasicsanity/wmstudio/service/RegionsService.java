@@ -86,6 +86,20 @@ public interface RegionsService {
      */
     Regions update(@Valid Regions regions);
 
+
+    /**
+     * Partially updates the details of an existing Regions. It updates only the
+     * fields of the existing Regions which are passed in the regionsPatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on Regions if any.
+     *
+     * @param regionsId The id of the Regions to be deleted; value cannot be null.
+     * @param regionsPatch The partial data of Regions which is supposed to be updated; value cannot be null.
+     * @return The updated Regions.
+     * @throws EntityNotFoundException if no Regions is found with given input.
+     */
+    Regions partialUpdate(BigInteger regionsId, Map<String, Object> regionsPatch);
+
     /**
      * Deletes an existing Regions with the given id.
      *

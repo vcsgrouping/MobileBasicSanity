@@ -28,7 +28,7 @@ import com.wavemaker.runtime.data.expression.QueryFilter;
 import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.manager.ExportedFileManager;
 import com.wavemaker.runtime.file.model.Downloadable;
-import com.wavemaker.runtime.security.xss.XssDisable;
+import com.wavemaker.tools.api.core.annotations.MapTo;
 import com.wavemaker.tools.api.core.annotations.WMAccessVisibility;
 import com.wavemaker.tools.api.core.models.AccessSpecifier;
 import com.wordnik.swagger.annotations.Api;
@@ -101,6 +101,22 @@ public class JobHistoryController {
         return jobHistoryService.update(jobHistory);
     }
 
+	@ApiOperation(value = "Partially updates the  JobHistory instance associated with the given composite-id.")
+	@RequestMapping(value = "/composite-id", method = RequestMethod.PATCH)
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+    public JobHistory patchJobHistory(@RequestParam("employeeId") Integer employeeId, @RequestParam("startDate") LocalDateTime startDate, @RequestBody @MapTo(JobHistory.class) Map<String, Object> jobHistoryPatch) {
+
+        JobHistoryId jobhistoryId = new JobHistoryId();
+        jobhistoryId.setEmployeeId(employeeId);
+        jobhistoryId.setStartDate(startDate);
+        LOGGER.debug("Partially updating JobHistory with id: {}" , jobhistoryId);
+
+        JobHistory jobHistory = jobHistoryService.partialUpdate(jobhistoryId, jobHistoryPatch);
+        LOGGER.debug("JobHistory details after partial update: {}" , jobHistory);
+
+        return jobHistory;
+    }
+
 
     @ApiOperation(value = "Deletes the JobHistory instance associated with the given composite-id.")
     @RequestMapping(value = "/composite-id", method = RequestMethod.DELETE)
@@ -125,7 +141,6 @@ public class JobHistoryController {
     @ApiOperation(value = "Returns the list of JobHistory instances matching the search criteria.")
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Page<JobHistory> searchJobHistoriesByQueryFilters( Pageable pageable, @RequestBody QueryFilter[] queryFilters) {
         LOGGER.debug("Rendering JobHistories list by query filter:{}", (Object) queryFilters);
         return jobHistoryService.findAll(queryFilters, pageable);
@@ -142,16 +157,14 @@ public class JobHistoryController {
     @ApiOperation(value = "Returns the paginated list of JobHistory instances matching the optional query (q) request param. This API should be used only if the query string is too big to fit in GET request with request param. The request has to made in application/x-www-form-urlencoded format.")
     @RequestMapping(value="/filter", method = RequestMethod.POST, consumes= "application/x-www-form-urlencoded")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Page<JobHistory> filterJobHistories(@ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query, Pageable pageable) {
         LOGGER.debug("Rendering JobHistories list by filter", query);
         return jobHistoryService.findAll(query, pageable);
     }
 
-    @ApiOperation(value = "Returns downloadable file for the data matching the optional query (q) request param. If query string is too big to fit in GET request's query param, use POST method with application/x-www-form-urlencoded format.")
-    @RequestMapping(value = "/export/{exportType}", method = {RequestMethod.GET,  RequestMethod.POST}, produces = "application/octet-stream")
+    @ApiOperation(value = "Returns downloadable file for the data matching the optional query (q) request param.")
+    @RequestMapping(value = "/export/{exportType}", method = RequestMethod.GET, produces = "application/octet-stream")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Downloadable exportJobHistories(@PathVariable("exportType") ExportType exportType, @ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query, Pageable pageable) {
          return jobHistoryService.export(exportType, query, pageable);
     }
@@ -159,7 +172,6 @@ public class JobHistoryController {
     @ApiOperation(value = "Returns a URL to download a file for the data matching the optional query (q) request param and the required fields provided in the Export Options.") 
     @RequestMapping(value = "/export", method = {RequestMethod.POST}, consumes = "application/json")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public StringWrapper exportJobHistoriesAndGetURL(@RequestBody DataExportOptions exportOptions, Pageable pageable) {
         String exportedFileName = exportOptions.getFileName();
         if(exportedFileName == null || exportedFileName.isEmpty()) {
@@ -170,10 +182,9 @@ public class JobHistoryController {
         return new StringWrapper(exportedUrl);
     }
 
-	@ApiOperation(value = "Returns the total count of JobHistory instances matching the optional query (q) request param. If query string is too big to fit in GET request's query param, use POST method with application/x-www-form-urlencoded format.")
-	@RequestMapping(value = "/count", method = {RequestMethod.GET, RequestMethod.POST})
+	@ApiOperation(value = "Returns the total count of JobHistory instances matching the optional query (q) request param.")
+	@RequestMapping(value = "/count", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	@XssDisable
 	public Long countJobHistories( @ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query) {
 		LOGGER.debug("counting JobHistories");
 		return jobHistoryService.count(query);
@@ -182,7 +193,6 @@ public class JobHistoryController {
     @ApiOperation(value = "Returns aggregated result with given aggregation info")
 	@RequestMapping(value = "/aggregations", method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	@XssDisable
 	public Page<Map<String, Object>> getJobHistoryAggregatedValues(@RequestBody AggregationInfo aggregationInfo, Pageable pageable) {
         LOGGER.debug("Fetching aggregated results for {}", aggregationInfo);
         return jobHistoryService.getAggregatedValues(aggregationInfo, pageable);

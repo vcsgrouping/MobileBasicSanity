@@ -85,6 +85,20 @@ public interface CountriesService {
      */
     Countries update(@Valid Countries countries);
 
+
+    /**
+     * Partially updates the details of an existing Countries. It updates only the
+     * fields of the existing Countries which are passed in the countriesPatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on Countries if any.
+     *
+     * @param countriesId The id of the Countries to be deleted; value cannot be null.
+     * @param countriesPatch The partial data of Countries which is supposed to be updated; value cannot be null.
+     * @return The updated Countries.
+     * @throws EntityNotFoundException if no Countries is found with given input.
+     */
+    Countries partialUpdate(String countriesId, Map<String, Object> countriesPatch);
+
     /**
      * Deletes an existing Countries with the given id.
      *

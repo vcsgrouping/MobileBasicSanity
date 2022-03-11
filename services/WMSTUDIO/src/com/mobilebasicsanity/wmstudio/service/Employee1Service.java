@@ -85,6 +85,20 @@ public interface Employee1Service {
      */
     Employee1 update(@Valid Employee1 employee1);
 
+
+    /**
+     * Partially updates the details of an existing Employee1. It updates only the
+     * fields of the existing Employee1 which are passed in the employee1Patch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on Employee1 if any.
+     *
+     * @param employee1Id The id of the Employee1 to be deleted; value cannot be null.
+     * @param employee1Patch The partial data of Employee1 which is supposed to be updated; value cannot be null.
+     * @return The updated Employee1.
+     * @throws EntityNotFoundException if no Employee1 is found with given input.
+     */
+    Employee1 partialUpdate(Employee1Id employee1Id, Map<String, Object> employee1Patch);
+
     /**
      * Deletes an existing Employee1 with the given id.
      *

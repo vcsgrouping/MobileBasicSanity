@@ -85,6 +85,20 @@ public interface IncludeService {
      */
     Include update(@Valid Include include);
 
+
+    /**
+     * Partially updates the details of an existing Include. It updates only the
+     * fields of the existing Include which are passed in the includePatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on Include if any.
+     *
+     * @param includeId The id of the Include to be deleted; value cannot be null.
+     * @param includePatch The partial data of Include which is supposed to be updated; value cannot be null.
+     * @return The updated Include.
+     * @throws EntityNotFoundException if no Include is found with given input.
+     */
+    Include partialUpdate(IncludeId includeId, Map<String, Object> includePatch);
+
     /**
      * Deletes an existing Include with the given id.
      *

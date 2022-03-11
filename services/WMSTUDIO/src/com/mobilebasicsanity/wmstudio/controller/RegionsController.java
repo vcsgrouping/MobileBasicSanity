@@ -28,7 +28,7 @@ import com.wavemaker.runtime.data.expression.QueryFilter;
 import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.manager.ExportedFileManager;
 import com.wavemaker.runtime.file.model.Downloadable;
-import com.wavemaker.runtime.security.xss.XssDisable;
+import com.wavemaker.tools.api.core.annotations.MapTo;
 import com.wavemaker.tools.api.core.annotations.WMAccessVisibility;
 import com.wavemaker.tools.api.core.models.AccessSpecifier;
 import com.wordnik.swagger.annotations.Api;
@@ -71,37 +71,49 @@ public class RegionsController {
 	}
 
     @ApiOperation(value = "Returns the Regions instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{regionId:.+}", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Regions getRegions(@PathVariable("id") BigInteger id) {
-        LOGGER.debug("Getting Regions with id: {}" , id);
+    public Regions getRegions(@PathVariable("regionId") BigInteger regionId) {
+        LOGGER.debug("Getting Regions with id: {}" , regionId);
 
-        Regions foundRegions = regionsService.getById(id);
+        Regions foundRegions = regionsService.getById(regionId);
         LOGGER.debug("Regions details with id: {}" , foundRegions);
 
         return foundRegions;
     }
 
     @ApiOperation(value = "Updates the Regions instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{regionId:.+}", method = RequestMethod.PUT)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Regions editRegions(@PathVariable("id") BigInteger id, @RequestBody Regions regions) {
+    public Regions editRegions(@PathVariable("regionId") BigInteger regionId, @RequestBody Regions regions) {
         LOGGER.debug("Editing Regions with id: {}" , regions.getRegionId());
 
-        regions.setRegionId(id);
+        regions.setRegionId(regionId);
         regions = regionsService.update(regions);
         LOGGER.debug("Regions details with id: {}" , regions);
 
         return regions;
     }
+    
+    @ApiOperation(value = "Partially updates the Regions instance associated with the given id.")
+    @RequestMapping(value = "/{regionId:.+}", method = RequestMethod.PATCH)
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+    public Regions patchRegions(@PathVariable("regionId") BigInteger regionId, @RequestBody @MapTo(Regions.class) Map<String, Object> regionsPatch) {
+        LOGGER.debug("Partially updating Regions with id: {}" , regionId);
+
+        Regions regions = regionsService.partialUpdate(regionId, regionsPatch);
+        LOGGER.debug("Regions details after partial update: {}" , regions);
+
+        return regions;
+    }
 
     @ApiOperation(value = "Deletes the Regions instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{regionId:.+}", method = RequestMethod.DELETE)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public boolean deleteRegions(@PathVariable("id") BigInteger id) {
-        LOGGER.debug("Deleting Regions with id: {}" , id);
+    public boolean deleteRegions(@PathVariable("regionId") BigInteger regionId) {
+        LOGGER.debug("Deleting Regions with id: {}" , regionId);
 
-        Regions deletedRegions = regionsService.delete(id);
+        Regions deletedRegions = regionsService.delete(regionId);
 
         return deletedRegions != null;
     }
@@ -113,7 +125,6 @@ public class RegionsController {
     @ApiOperation(value = "Returns the list of Regions instances matching the search criteria.")
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Page<Regions> searchRegionsByQueryFilters( Pageable pageable, @RequestBody QueryFilter[] queryFilters) {
         LOGGER.debug("Rendering Regions list by query filter:{}", (Object) queryFilters);
         return regionsService.findAll(queryFilters, pageable);
@@ -130,16 +141,14 @@ public class RegionsController {
     @ApiOperation(value = "Returns the paginated list of Regions instances matching the optional query (q) request param. This API should be used only if the query string is too big to fit in GET request with request param. The request has to made in application/x-www-form-urlencoded format.")
     @RequestMapping(value="/filter", method = RequestMethod.POST, consumes= "application/x-www-form-urlencoded")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Page<Regions> filterRegions(@ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query, Pageable pageable) {
         LOGGER.debug("Rendering Regions list by filter", query);
         return regionsService.findAll(query, pageable);
     }
 
-    @ApiOperation(value = "Returns downloadable file for the data matching the optional query (q) request param. If query string is too big to fit in GET request's query param, use POST method with application/x-www-form-urlencoded format.")
-    @RequestMapping(value = "/export/{exportType}", method = {RequestMethod.GET,  RequestMethod.POST}, produces = "application/octet-stream")
+    @ApiOperation(value = "Returns downloadable file for the data matching the optional query (q) request param.")
+    @RequestMapping(value = "/export/{exportType}", method = RequestMethod.GET, produces = "application/octet-stream")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Downloadable exportRegions(@PathVariable("exportType") ExportType exportType, @ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query, Pageable pageable) {
          return regionsService.export(exportType, query, pageable);
     }
@@ -147,7 +156,6 @@ public class RegionsController {
     @ApiOperation(value = "Returns a URL to download a file for the data matching the optional query (q) request param and the required fields provided in the Export Options.") 
     @RequestMapping(value = "/export", method = {RequestMethod.POST}, consumes = "application/json")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public StringWrapper exportRegionsAndGetURL(@RequestBody DataExportOptions exportOptions, Pageable pageable) {
         String exportedFileName = exportOptions.getFileName();
         if(exportedFileName == null || exportedFileName.isEmpty()) {
@@ -158,10 +166,9 @@ public class RegionsController {
         return new StringWrapper(exportedUrl);
     }
 
-	@ApiOperation(value = "Returns the total count of Regions instances matching the optional query (q) request param. If query string is too big to fit in GET request's query param, use POST method with application/x-www-form-urlencoded format.")
-	@RequestMapping(value = "/count", method = {RequestMethod.GET, RequestMethod.POST})
+	@ApiOperation(value = "Returns the total count of Regions instances matching the optional query (q) request param.")
+	@RequestMapping(value = "/count", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	@XssDisable
 	public Long countRegions( @ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query) {
 		LOGGER.debug("counting Regions");
 		return regionsService.count(query);
@@ -170,19 +177,18 @@ public class RegionsController {
     @ApiOperation(value = "Returns aggregated result with given aggregation info")
 	@RequestMapping(value = "/aggregations", method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	@XssDisable
 	public Page<Map<String, Object>> getRegionsAggregatedValues(@RequestBody AggregationInfo aggregationInfo, Pageable pageable) {
         LOGGER.debug("Fetching aggregated results for {}", aggregationInfo);
         return regionsService.getAggregatedValues(aggregationInfo, pageable);
     }
 
-    @RequestMapping(value="/{id:.+}/countrieses", method=RequestMethod.GET)
+    @RequestMapping(value="/{regionId:.+}/countrieses", method=RequestMethod.GET)
     @ApiOperation(value = "Gets the countrieses instance associated with the given id.")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Page<Countries> findAssociatedCountrieses(@PathVariable("id") BigInteger id, Pageable pageable) {
+    public Page<Countries> findAssociatedCountrieses(@PathVariable("regionId") BigInteger regionId, Pageable pageable) {
 
         LOGGER.debug("Fetching all associated countrieses");
-        return regionsService.findAssociatedCountrieses(id, pageable);
+        return regionsService.findAssociatedCountrieses(regionId, pageable);
     }
 
     /**

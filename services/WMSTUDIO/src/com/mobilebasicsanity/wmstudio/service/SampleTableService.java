@@ -85,6 +85,20 @@ public interface SampleTableService {
      */
     SampleTable update(@Valid SampleTable sampleTable);
 
+
+    /**
+     * Partially updates the details of an existing SampleTable. It updates only the
+     * fields of the existing SampleTable which are passed in the sampleTablePatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on SampleTable if any.
+     *
+     * @param sampletableId The id of the SampleTable to be deleted; value cannot be null.
+     * @param sampleTablePatch The partial data of SampleTable which is supposed to be updated; value cannot be null.
+     * @return The updated SampleTable.
+     * @throws EntityNotFoundException if no SampleTable is found with given input.
+     */
+    SampleTable partialUpdate(SampleTableId sampletableId, Map<String, Object> sampleTablePatch);
+
     /**
      * Deletes an existing SampleTable with the given id.
      *

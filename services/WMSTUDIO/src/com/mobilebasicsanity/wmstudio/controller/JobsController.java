@@ -27,7 +27,7 @@ import com.wavemaker.runtime.data.expression.QueryFilter;
 import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.manager.ExportedFileManager;
 import com.wavemaker.runtime.file.model.Downloadable;
-import com.wavemaker.runtime.security.xss.XssDisable;
+import com.wavemaker.tools.api.core.annotations.MapTo;
 import com.wavemaker.tools.api.core.annotations.WMAccessVisibility;
 import com.wavemaker.tools.api.core.models.AccessSpecifier;
 import com.wordnik.swagger.annotations.Api;
@@ -71,37 +71,49 @@ public class JobsController {
 	}
 
     @ApiOperation(value = "Returns the Jobs instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{jobId:.+}", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Jobs getJobs(@PathVariable("id") String id) {
-        LOGGER.debug("Getting Jobs with id: {}" , id);
+    public Jobs getJobs(@PathVariable("jobId") String jobId) {
+        LOGGER.debug("Getting Jobs with id: {}" , jobId);
 
-        Jobs foundJobs = jobsService.getById(id);
+        Jobs foundJobs = jobsService.getById(jobId);
         LOGGER.debug("Jobs details with id: {}" , foundJobs);
 
         return foundJobs;
     }
 
     @ApiOperation(value = "Updates the Jobs instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{jobId:.+}", method = RequestMethod.PUT)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Jobs editJobs(@PathVariable("id") String id, @RequestBody Jobs jobs) {
+    public Jobs editJobs(@PathVariable("jobId") String jobId, @RequestBody Jobs jobs) {
         LOGGER.debug("Editing Jobs with id: {}" , jobs.getJobId());
 
-        jobs.setJobId(id);
+        jobs.setJobId(jobId);
         jobs = jobsService.update(jobs);
         LOGGER.debug("Jobs details with id: {}" , jobs);
 
         return jobs;
     }
+    
+    @ApiOperation(value = "Partially updates the Jobs instance associated with the given id.")
+    @RequestMapping(value = "/{jobId:.+}", method = RequestMethod.PATCH)
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+    public Jobs patchJobs(@PathVariable("jobId") String jobId, @RequestBody @MapTo(Jobs.class) Map<String, Object> jobsPatch) {
+        LOGGER.debug("Partially updating Jobs with id: {}" , jobId);
+
+        Jobs jobs = jobsService.partialUpdate(jobId, jobsPatch);
+        LOGGER.debug("Jobs details after partial update: {}" , jobs);
+
+        return jobs;
+    }
 
     @ApiOperation(value = "Deletes the Jobs instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{jobId:.+}", method = RequestMethod.DELETE)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public boolean deleteJobs(@PathVariable("id") String id) {
-        LOGGER.debug("Deleting Jobs with id: {}" , id);
+    public boolean deleteJobs(@PathVariable("jobId") String jobId) {
+        LOGGER.debug("Deleting Jobs with id: {}" , jobId);
 
-        Jobs deletedJobs = jobsService.delete(id);
+        Jobs deletedJobs = jobsService.delete(jobId);
 
         return deletedJobs != null;
     }
@@ -113,7 +125,6 @@ public class JobsController {
     @ApiOperation(value = "Returns the list of Jobs instances matching the search criteria.")
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Page<Jobs> searchJobsByQueryFilters( Pageable pageable, @RequestBody QueryFilter[] queryFilters) {
         LOGGER.debug("Rendering Jobs list by query filter:{}", (Object) queryFilters);
         return jobsService.findAll(queryFilters, pageable);
@@ -130,16 +141,14 @@ public class JobsController {
     @ApiOperation(value = "Returns the paginated list of Jobs instances matching the optional query (q) request param. This API should be used only if the query string is too big to fit in GET request with request param. The request has to made in application/x-www-form-urlencoded format.")
     @RequestMapping(value="/filter", method = RequestMethod.POST, consumes= "application/x-www-form-urlencoded")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Page<Jobs> filterJobs(@ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query, Pageable pageable) {
         LOGGER.debug("Rendering Jobs list by filter", query);
         return jobsService.findAll(query, pageable);
     }
 
-    @ApiOperation(value = "Returns downloadable file for the data matching the optional query (q) request param. If query string is too big to fit in GET request's query param, use POST method with application/x-www-form-urlencoded format.")
-    @RequestMapping(value = "/export/{exportType}", method = {RequestMethod.GET,  RequestMethod.POST}, produces = "application/octet-stream")
+    @ApiOperation(value = "Returns downloadable file for the data matching the optional query (q) request param.")
+    @RequestMapping(value = "/export/{exportType}", method = RequestMethod.GET, produces = "application/octet-stream")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Downloadable exportJobs(@PathVariable("exportType") ExportType exportType, @ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query, Pageable pageable) {
          return jobsService.export(exportType, query, pageable);
     }
@@ -147,7 +156,6 @@ public class JobsController {
     @ApiOperation(value = "Returns a URL to download a file for the data matching the optional query (q) request param and the required fields provided in the Export Options.") 
     @RequestMapping(value = "/export", method = {RequestMethod.POST}, consumes = "application/json")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public StringWrapper exportJobsAndGetURL(@RequestBody DataExportOptions exportOptions, Pageable pageable) {
         String exportedFileName = exportOptions.getFileName();
         if(exportedFileName == null || exportedFileName.isEmpty()) {
@@ -158,10 +166,9 @@ public class JobsController {
         return new StringWrapper(exportedUrl);
     }
 
-	@ApiOperation(value = "Returns the total count of Jobs instances matching the optional query (q) request param. If query string is too big to fit in GET request's query param, use POST method with application/x-www-form-urlencoded format.")
-	@RequestMapping(value = "/count", method = {RequestMethod.GET, RequestMethod.POST})
+	@ApiOperation(value = "Returns the total count of Jobs instances matching the optional query (q) request param.")
+	@RequestMapping(value = "/count", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	@XssDisable
 	public Long countJobs( @ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query) {
 		LOGGER.debug("counting Jobs");
 		return jobsService.count(query);
@@ -170,28 +177,27 @@ public class JobsController {
     @ApiOperation(value = "Returns aggregated result with given aggregation info")
 	@RequestMapping(value = "/aggregations", method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	@XssDisable
 	public Page<Map<String, Object>> getJobsAggregatedValues(@RequestBody AggregationInfo aggregationInfo, Pageable pageable) {
         LOGGER.debug("Fetching aggregated results for {}", aggregationInfo);
         return jobsService.getAggregatedValues(aggregationInfo, pageable);
     }
 
-    @RequestMapping(value="/{id:.+}/employeeses", method=RequestMethod.GET)
+    @RequestMapping(value="/{jobId:.+}/employeeses", method=RequestMethod.GET)
     @ApiOperation(value = "Gets the employeeses instance associated with the given id.")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Page<Employees> findAssociatedEmployeeses(@PathVariable("id") String id, Pageable pageable) {
+    public Page<Employees> findAssociatedEmployeeses(@PathVariable("jobId") String jobId, Pageable pageable) {
 
         LOGGER.debug("Fetching all associated employeeses");
-        return jobsService.findAssociatedEmployeeses(id, pageable);
+        return jobsService.findAssociatedEmployeeses(jobId, pageable);
     }
 
-    @RequestMapping(value="/{id:.+}/jobHistories", method=RequestMethod.GET)
+    @RequestMapping(value="/{jobId:.+}/jobHistories", method=RequestMethod.GET)
     @ApiOperation(value = "Gets the jobHistories instance associated with the given id.")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Page<JobHistory> findAssociatedJobHistories(@PathVariable("id") String id, Pageable pageable) {
+    public Page<JobHistory> findAssociatedJobHistories(@PathVariable("jobId") String jobId, Pageable pageable) {
 
         LOGGER.debug("Fetching all associated jobHistories");
-        return jobsService.findAssociatedJobHistories(id, pageable);
+        return jobsService.findAssociatedJobHistories(jobId, pageable);
     }
 
     /**

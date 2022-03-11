@@ -86,6 +86,20 @@ public interface JobsService {
      */
     Jobs update(@Valid Jobs jobs);
 
+
+    /**
+     * Partially updates the details of an existing Jobs. It updates only the
+     * fields of the existing Jobs which are passed in the jobsPatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on Jobs if any.
+     *
+     * @param jobsId The id of the Jobs to be deleted; value cannot be null.
+     * @param jobsPatch The partial data of Jobs which is supposed to be updated; value cannot be null.
+     * @return The updated Jobs.
+     * @throws EntityNotFoundException if no Jobs is found with given input.
+     */
+    Jobs partialUpdate(String jobsId, Map<String, Object> jobsPatch);
+
     /**
      * Deletes an existing Jobs with the given id.
      *

@@ -85,6 +85,20 @@ public interface LocationsService {
      */
     Locations update(@Valid Locations locations);
 
+
+    /**
+     * Partially updates the details of an existing Locations. It updates only the
+     * fields of the existing Locations which are passed in the locationsPatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on Locations if any.
+     *
+     * @param locationsId The id of the Locations to be deleted; value cannot be null.
+     * @param locationsPatch The partial data of Locations which is supposed to be updated; value cannot be null.
+     * @return The updated Locations.
+     * @throws EntityNotFoundException if no Locations is found with given input.
+     */
+    Locations partialUpdate(Short locationsId, Map<String, Object> locationsPatch);
+
     /**
      * Deletes an existing Locations with the given id.
      *

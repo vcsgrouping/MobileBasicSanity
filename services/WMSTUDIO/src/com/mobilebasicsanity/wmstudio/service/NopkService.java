@@ -85,6 +85,20 @@ public interface NopkService {
      */
     Nopk update(@Valid Nopk nopk);
 
+
+    /**
+     * Partially updates the details of an existing Nopk. It updates only the
+     * fields of the existing Nopk which are passed in the nopkPatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on Nopk if any.
+     *
+     * @param nopkId The id of the Nopk to be deleted; value cannot be null.
+     * @param nopkPatch The partial data of Nopk which is supposed to be updated; value cannot be null.
+     * @return The updated Nopk.
+     * @throws EntityNotFoundException if no Nopk is found with given input.
+     */
+    Nopk partialUpdate(BigInteger nopkId, Map<String, Object> nopkPatch);
+
     /**
      * Deletes an existing Nopk with the given id.
      *

@@ -85,6 +85,20 @@ public interface EmpDetailsViewService {
      */
     EmpDetailsView update(@Valid EmpDetailsView empDetailsView);
 
+
+    /**
+     * Partially updates the details of an existing EmpDetailsView. It updates only the
+     * fields of the existing EmpDetailsView which are passed in the empDetailsViewPatch.
+     *
+     * This method overrides the input field values using Server side or database managed properties defined on EmpDetailsView if any.
+     *
+     * @param empdetailsviewId The id of the EmpDetailsView to be deleted; value cannot be null.
+     * @param empDetailsViewPatch The partial data of EmpDetailsView which is supposed to be updated; value cannot be null.
+     * @return The updated EmpDetailsView.
+     * @throws EntityNotFoundException if no EmpDetailsView is found with given input.
+     */
+    EmpDetailsView partialUpdate(EmpDetailsViewId empdetailsviewId, Map<String, Object> empDetailsViewPatch);
+
     /**
      * Deletes an existing EmpDetailsView with the given id.
      *

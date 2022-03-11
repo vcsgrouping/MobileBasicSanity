@@ -27,7 +27,7 @@ import com.wavemaker.runtime.data.expression.QueryFilter;
 import com.wavemaker.runtime.data.model.AggregationInfo;
 import com.wavemaker.runtime.file.manager.ExportedFileManager;
 import com.wavemaker.runtime.file.model.Downloadable;
-import com.wavemaker.runtime.security.xss.XssDisable;
+import com.wavemaker.tools.api.core.annotations.MapTo;
 import com.wavemaker.tools.api.core.annotations.WMAccessVisibility;
 import com.wavemaker.tools.api.core.models.AccessSpecifier;
 import com.wordnik.swagger.annotations.Api;
@@ -70,37 +70,49 @@ public class LocationsController {
 	}
 
     @ApiOperation(value = "Returns the Locations instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{locationId:.+}", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Locations getLocations(@PathVariable("id") Short id) {
-        LOGGER.debug("Getting Locations with id: {}" , id);
+    public Locations getLocations(@PathVariable("locationId") Short locationId) {
+        LOGGER.debug("Getting Locations with id: {}" , locationId);
 
-        Locations foundLocations = locationsService.getById(id);
+        Locations foundLocations = locationsService.getById(locationId);
         LOGGER.debug("Locations details with id: {}" , foundLocations);
 
         return foundLocations;
     }
 
     @ApiOperation(value = "Updates the Locations instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{locationId:.+}", method = RequestMethod.PUT)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Locations editLocations(@PathVariable("id") Short id, @RequestBody Locations locations) {
+    public Locations editLocations(@PathVariable("locationId") Short locationId, @RequestBody Locations locations) {
         LOGGER.debug("Editing Locations with id: {}" , locations.getLocationId());
 
-        locations.setLocationId(id);
+        locations.setLocationId(locationId);
         locations = locationsService.update(locations);
         LOGGER.debug("Locations details with id: {}" , locations);
 
         return locations;
     }
+    
+    @ApiOperation(value = "Partially updates the Locations instance associated with the given id.")
+    @RequestMapping(value = "/{locationId:.+}", method = RequestMethod.PATCH)
+    @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
+    public Locations patchLocations(@PathVariable("locationId") Short locationId, @RequestBody @MapTo(Locations.class) Map<String, Object> locationsPatch) {
+        LOGGER.debug("Partially updating Locations with id: {}" , locationId);
+
+        Locations locations = locationsService.partialUpdate(locationId, locationsPatch);
+        LOGGER.debug("Locations details after partial update: {}" , locations);
+
+        return locations;
+    }
 
     @ApiOperation(value = "Deletes the Locations instance associated with the given id.")
-    @RequestMapping(value = "/{id:.+}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{locationId:.+}", method = RequestMethod.DELETE)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public boolean deleteLocations(@PathVariable("id") Short id) {
-        LOGGER.debug("Deleting Locations with id: {}" , id);
+    public boolean deleteLocations(@PathVariable("locationId") Short locationId) {
+        LOGGER.debug("Deleting Locations with id: {}" , locationId);
 
-        Locations deletedLocations = locationsService.delete(id);
+        Locations deletedLocations = locationsService.delete(locationId);
 
         return deletedLocations != null;
     }
@@ -112,7 +124,6 @@ public class LocationsController {
     @ApiOperation(value = "Returns the list of Locations instances matching the search criteria.")
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Page<Locations> searchLocationsByQueryFilters( Pageable pageable, @RequestBody QueryFilter[] queryFilters) {
         LOGGER.debug("Rendering Locations list by query filter:{}", (Object) queryFilters);
         return locationsService.findAll(queryFilters, pageable);
@@ -129,16 +140,14 @@ public class LocationsController {
     @ApiOperation(value = "Returns the paginated list of Locations instances matching the optional query (q) request param. This API should be used only if the query string is too big to fit in GET request with request param. The request has to made in application/x-www-form-urlencoded format.")
     @RequestMapping(value="/filter", method = RequestMethod.POST, consumes= "application/x-www-form-urlencoded")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Page<Locations> filterLocations(@ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query, Pageable pageable) {
         LOGGER.debug("Rendering Locations list by filter", query);
         return locationsService.findAll(query, pageable);
     }
 
-    @ApiOperation(value = "Returns downloadable file for the data matching the optional query (q) request param. If query string is too big to fit in GET request's query param, use POST method with application/x-www-form-urlencoded format.")
-    @RequestMapping(value = "/export/{exportType}", method = {RequestMethod.GET,  RequestMethod.POST}, produces = "application/octet-stream")
+    @ApiOperation(value = "Returns downloadable file for the data matching the optional query (q) request param.")
+    @RequestMapping(value = "/export/{exportType}", method = RequestMethod.GET, produces = "application/octet-stream")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public Downloadable exportLocations(@PathVariable("exportType") ExportType exportType, @ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query, Pageable pageable) {
          return locationsService.export(exportType, query, pageable);
     }
@@ -146,7 +155,6 @@ public class LocationsController {
     @ApiOperation(value = "Returns a URL to download a file for the data matching the optional query (q) request param and the required fields provided in the Export Options.") 
     @RequestMapping(value = "/export", method = {RequestMethod.POST}, consumes = "application/json")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    @XssDisable
     public StringWrapper exportLocationsAndGetURL(@RequestBody DataExportOptions exportOptions, Pageable pageable) {
         String exportedFileName = exportOptions.getFileName();
         if(exportedFileName == null || exportedFileName.isEmpty()) {
@@ -157,10 +165,9 @@ public class LocationsController {
         return new StringWrapper(exportedUrl);
     }
 
-	@ApiOperation(value = "Returns the total count of Locations instances matching the optional query (q) request param. If query string is too big to fit in GET request's query param, use POST method with application/x-www-form-urlencoded format.")
-	@RequestMapping(value = "/count", method = {RequestMethod.GET, RequestMethod.POST})
+	@ApiOperation(value = "Returns the total count of Locations instances matching the optional query (q) request param.")
+	@RequestMapping(value = "/count", method = RequestMethod.GET)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	@XssDisable
 	public Long countLocations( @ApiParam("conditions to filter the results") @RequestParam(value = "q", required = false) String query) {
 		LOGGER.debug("counting Locations");
 		return locationsService.count(query);
@@ -169,19 +176,18 @@ public class LocationsController {
     @ApiOperation(value = "Returns aggregated result with given aggregation info")
 	@RequestMapping(value = "/aggregations", method = RequestMethod.POST)
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-	@XssDisable
 	public Page<Map<String, Object>> getLocationsAggregatedValues(@RequestBody AggregationInfo aggregationInfo, Pageable pageable) {
         LOGGER.debug("Fetching aggregated results for {}", aggregationInfo);
         return locationsService.getAggregatedValues(aggregationInfo, pageable);
     }
 
-    @RequestMapping(value="/{id:.+}/departmentses", method=RequestMethod.GET)
+    @RequestMapping(value="/{locationId:.+}/departmentses", method=RequestMethod.GET)
     @ApiOperation(value = "Gets the departmentses instance associated with the given id.")
     @WMAccessVisibility(value = AccessSpecifier.APP_ONLY)
-    public Page<Departments> findAssociatedDepartmentses(@PathVariable("id") Short id, Pageable pageable) {
+    public Page<Departments> findAssociatedDepartmentses(@PathVariable("locationId") Short locationId, Pageable pageable) {
 
         LOGGER.debug("Fetching all associated departmentses");
-        return locationsService.findAssociatedDepartmentses(id, pageable);
+        return locationsService.findAssociatedDepartmentses(locationId, pageable);
     }
 
     /**
