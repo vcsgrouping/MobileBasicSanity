@@ -374,7 +374,7 @@
         <profile.props.file>development.properties</profile.props.file>
         <wavemaker.app.runtime.services.version>10.13.0.ee</wavemaker.app.runtime.services.version>
         <wavemaker.studio.version>10.13.0.ee</wavemaker.studio.version>
-        <wavemaker.app.runtime.ui.version>10.13.0-rc.5156</wavemaker.app.runtime.ui.version>
+        <wavemaker.app.runtime.ui.version>10.13.0-rc.5157</wavemaker.app.runtime.ui.version>
         <wavemaker.studio.release.version>10.0.0</wavemaker.studio.release.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.lib.directory>${basedir}/lib</project.lib.directory>
